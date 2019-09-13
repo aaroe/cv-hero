@@ -12,25 +12,28 @@ resources:
     image: mcr.microsoft.com/dotnet/core/sdk:3.0
 
 stages:
-- stage: build
-  jobs:
-  - job:
-    pool:
-      vmImage: 'ubuntu-16.04'
-    steps:
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'build'
-        projects: '**/*.csproj'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'webapi-drop'
-        publishLocation: 'Container'
-    - script: echo Hello, world!
-      displayName: 'Run a one-line script'
+  - stage: Build
+    jobs:
+      - job:
+        pool:
+          vmImage: 'ubuntu-16.04'
+        container: dotnetcorecontainer
+        steps:
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'build'
+              projects: '**/*.csproj'
+              arguments: '--configuration Release --output $(build.artifactstagingdirectory)'
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'webapi-drop'
+              publishLocation: 'Container'
 
-    - script: |
-        echo Add other tasks to build, test, and deploy your project.
-        echo See https://aka.ms/yaml
-      displayName: 'Run a multi-line script'
+          - script: echo Hello, world!
+            displayName: 'Run a one-line script'
+
+          - script: |
+              echo Add other tasks to build, test, and deploy your project.
+              echo See https://aka.ms/yaml
+            displayName: 'Run a multi-line script'
